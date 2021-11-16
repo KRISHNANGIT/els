@@ -4,8 +4,8 @@ const axios = require('axios');
 const app = express()
 app.use(express.json())
 
-const USERNAME = 'elastic';
-const PASSWORD = 'V8GOERQioF2r08uMcjGE1gtp';
+const USERNAME = process.env.USERNAME;
+const PASSWORD = process.env.PASSWORD;
 const token = `${USERNAME}:${PASSWORD}`;
 const encodedToken = Buffer.from(token).toString('base64');
 const headers = { 'Authorization': 'Basic '+ encodedToken };
