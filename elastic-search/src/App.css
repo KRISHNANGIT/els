@@ -1,0 +1,24 @@
+.App {
+  /* text-align: center; */
+  margin: 10px;
+}
+
+.row-1{
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px;
+}
+
+.row-2{
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px;
+}
+.url{
+  display: flex;
+  justify-content: center;
+}
+
+#url{
+  min-width: 80%;
+}
