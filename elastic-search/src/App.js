@@ -2,14 +2,6 @@ import "./App.css";
 import React, { useState } from "react";
 import axios from "axios";
 
-const USERNAME = "elastic";
-const PASSWORD = "V8GOERQioF2r08uMcjGE1gtp";
-const token = `${USERNAME}:${PASSWORD}`;
-const encodedToken = Buffer.from(token).toString("base64");
-// const headers = {
-//   Authorization: "Basic " + encodedToken,
-// };
-
 const App = () => {
   const url = {
     dev: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243",
@@ -45,7 +37,6 @@ const App = () => {
   };
 
   const handleSend = async () => {
-    console.log({ body: JSON.parse(body) });
     if(operation === '_count'){
       await axios
         .get('/count')
