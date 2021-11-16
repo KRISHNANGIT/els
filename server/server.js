@@ -11,17 +11,16 @@ const encodedToken = Buffer.from(token).toString('base64');
 const headers = { 'Authorization': 'Basic '+ encodedToken };
 
 
-app.get("/count", async(req,res) => {
-    const BASE_URL="https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243/dfr.shipment/_count"
-  
-    const count = await axios.get(BASE_URL, { headers })
+app.post("/count", async(req,res) => {
+    console.log({base_url:req.body.base_url})
+    const count = await axios.get(req.body.base_url, { headers })
     res.send(count.data)
 })
 
 app.post("/search", async(req,res) => {
-    const BASE_URL="https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243/dfr.shipment/_search"
-    console.log(req.body)
-    const count = await axios.get(BASE_URL, { headers, data: req.body })
+    const { data, base_url} = req.body
+    console.log({ data, base_url})
+    const count = await axios.get(base_url, { headers, data })
     res.send(count.data)
 })
 

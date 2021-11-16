@@ -5,7 +5,7 @@ import axios from "axios";
 const App = () => {
   const url = {
     dev: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243",
-    test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243test",
+    test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243",
   };
   const [env, setEnv] = useState(url.dev);
   const [index, setIndex] = useState("dfr.shipment");
@@ -37,17 +37,19 @@ const App = () => {
   };
 
   const handleSend = async () => {
+    setResp('')
     if(operation === '_count'){
       await axios
-        .get('/count')
+        .post('/count', {base_url})
         .then((res) => {
           console.log(res)
           setResp(JSON.stringify(res.data, null, "\t"))
         })
         .catch((e) => setResp(e));
     } else{
+      const data = body ? JSON.parse(body) : {}
       await axios
-        .post("/search",  JSON.parse(body))
+        .post("/search",  {data,base_url})
         .then((res) => setResp(JSON.stringify(res.data, null, 4)))
         .catch((e) => setResp(e));
     }
@@ -61,7 +63,7 @@ const App = () => {
 
           <select onChange={handleIndex}>
             <option value="dfr.shipment">dfr.shipment</option>
-            <option value="dfr.orderhitory">dfr.orderhitory</option>
+            <option value="dfr.orderhistory">dfr.orderhistory</option>
             <option value="dfr.customer">dfr.customer</option>
           </select>
         </div>
@@ -107,7 +109,7 @@ const App = () => {
         <div className="response">
           <label>response:</label>
           <br />
-          <textarea rows="90" cols="100"  value={resp}></textarea>
+          <textarea rows="32" cols="100"  value={resp}></textarea>
         </div>
       </div>
     </div>
