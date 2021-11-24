@@ -1,3 +1,24 @@
-.row-1{
+.row-1 {
   height: 80vh;
+}
+
+.card {
+  margin-left: 11.1rem !important;
+}
+
+.card p:hover {
+  cursor: pointer;
+  background-color: lightgrey;
+}
+
+#checkbox {
+  cursor: pointer;
+}
+
+#remove {
+  cursor: pointer;
+}
+
+table td {
+  overflow:hidden;/* optionnal*/
 }

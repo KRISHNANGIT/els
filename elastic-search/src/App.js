@@ -5,70 +5,85 @@ import CodeMirror from "@uiw/react-codemirror";
 import { json } from "@codemirror/lang-json";
 import { useState } from "react";
 import axios from "axios";
-import prettyBytes from "pretty-bytes"
-import Body from './Body';
-import Auth from './Auth';
+import prettyBytes from "pretty-bytes";
+import Body from "./Body";
+import Auth from "./Auth";
+import Params from "./Params";
+import Headers from "./Headers";
+
+const queryParam = {
+  checked: false,
+  key: "",
+  value: "",
+  description: "",
+};
 
 const urls = {
   // default: "",
   dev: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243",
-  test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243test",
+  test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.comtest:9243/test",
 };
 
 function App() {
-  const [status, setStatus] = useState();
-  const [size, setSize] = useState('')
-  const [time, setTime] = useState('')
+  const [status, setStatus] = useState('');
+  const [size, setSize] = useState("");
+  const [time, setTime] = useState("");
   const [url, setUrl] = useState(urls.dev);
-  const [restHead, setRestHead] = useState('Body')
+  const [restHead, setRestHead] = useState("Body");
+  const [qpList, setQpList] = useState([queryParam]);
   const [auth, setAuth] = useState({
-    username: '',
-    password: ''
-  })
+    username: localStorage.getItem("username"),
+    password: localStorage.getItem("password"),
+  });
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
-  console.log({restHead})
 
   const handleSubmit = async () => {
     setResValue("");
-    axios.interceptors.request.use(request => {
-      request.customData = request.customData || {}
-      request.customData.startTime = new Date().getTime()
-      return request
-    })
-  
+    axios.interceptors.request.use((request) => {
+      request.customData = request.customData || {};
+      request.customData.startTime = new Date().getTime();
+      return request;
+    });
+
     function updateEndTime(response) {
-      console.log({response})
-      response.customData = response.customData || {}
+      console.log({ response });
+      response.customData = response.customData || {};
       response.customData.time =
-        new Date().getTime() - response.config.customData.startTime
-      return response
+        new Date().getTime() - response.config.customData.startTime;
+      return response;
     }
-    
-    axios.interceptors.response.use(updateEndTime, e => {
-      return Promise.reject(updateEndTime(e.response))
-    })
+
+    axios.interceptors.response.use(updateEndTime, (e) => {
+      return Promise.reject(updateEndTime(e.response));
+    });
     if (url) {
-      const data = JSON.parse(reqValue || null)
+      const data = JSON.parse(reqValue || null);
       await axios
         .post("/search", { url, data, auth })
         .then((res) => {
-          console.log(res?.data?.status)
+          console.log(res?.data?.status);
           setStatus(res.status);
-          if(res.data.status) setStatus(res.data.status)
+          if (res.data.status) setStatus(res.data.status);
           setResValue(JSON.stringify(res.data, null, 4) || null);
-          setSize(prettyBytes(
-            JSON.stringify(res.data).length +
-              JSON.stringify(res.headers).length
-          ))
-          setTime(res.customData.time)
+          setSize(
+            prettyBytes(
+              JSON.stringify(res.data).length +
+                JSON.stringify(res.headers).length
+            )
+          );
+          setTime(res.customData.time);
         })
         .catch((e) => {
-          console.log(e)
+          console.log(e);
           setResValue(e);
-        });        
+        });
     }
   };
+
+  const handleUrl = (e) => {
+    setUrl(e.target.value)
+  }
 
   return (
     <div className="container-fluid p-4">
@@ -91,8 +106,18 @@ function App() {
           type="url"
           className="form-control"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={handleUrl}
         />
+        {/* <div
+          className="card position-absolute top-100"
+          style={{ width: "67rem", zIndex: "1" }}
+        >
+          <p className='m-0 p-1'>{urls.dev}</p>
+          <p className='m-0 p-1'>{urls.dev}</p>
+          <p className='m-0 p-1'>{urls.dev}</p>
+          <p className='m-0 p-1'>{urls.dev}</p>
+          <p className='m-0 p-1'>{urls.dev}</p>
+        </div> */}
         <button
           type="submit"
           className="btn btn-primary"
@@ -102,7 +127,7 @@ function App() {
         </button>
       </div>
       <div className="row border-top border-bottom row-1">
-        <div className="col-5 border-end">
+        <div className="col-5 border-end outer">
           <select onChange={(e) => setRestHead(e.target.value)}>
             <option value="Params">Params</option>
             <option value="Auth">Auth</option>
@@ -111,8 +136,12 @@ function App() {
               Body
             </option>
           </select>
-          { restHead === 'Body' && <Body reqValue={reqValue} setReqValue={setReqValue} />}
-          { restHead === 'Auth' && <Auth auth={auth} setAuth={setAuth} /> }
+          {restHead === "Body" && (
+            <Body reqValue={reqValue} setReqValue={setReqValue} />
+          )}
+          {restHead === "Auth" && <Auth auth={auth} setAuth={setAuth} />}
+          {restHead === "Params" && <Params qpList={qpList} setQpList={setQpList} queryParam={queryParam} url={url} setUrl={setUrl}/>}
+          {restHead === "Headers" && <Headers auth={auth}/>}
         </div>
         <div className="col-7">
           <div className="d-flex justify-content-between my-2">
@@ -122,7 +151,7 @@ function App() {
                 Status: <span data-status>{status}</span>
               </div>
               <div className="me-4">
-                Time: <span data-time>{time?`${time}ms`:''}</span>
+                Time: <span data-time>{time ? `${time}ms` : ""}</span>
               </div>
               <div className="me-4">
                 Size: <span data-size>{size}</span>
