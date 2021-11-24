@@ -18,7 +18,3 @@
 #remove {
   cursor: pointer;
 }
-
-table td {
-  overflow:hidden;/* optionnal*/
-}

@@ -25,7 +25,9 @@ const urls = {
 };
 
 function App() {
-  const [status, setStatus] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [method, setMethod] = useState("GET");
+  const [status, setStatus] = useState("");
   const [size, setSize] = useState("");
   const [time, setTime] = useState("");
   const [url, setUrl] = useState(urls.dev);
@@ -59,13 +61,21 @@ function App() {
     });
     if (url) {
       const data = JSON.parse(reqValue || null);
+      setIsLoading(true);
       await axios
-        .post("/search", { url, data, auth })
+        .post("/search", { url, data, auth, method })
         .then((res) => {
-          console.log(res?.data?.status);
+          setIsLoading(false);
+          console.log(res);
+          let content_type = res.headers['content-type'].split(';')[0]
           setStatus(res.status);
           if (res.data.status) setStatus(res.data.status);
-          setResValue(JSON.stringify(res.data, null, 4) || null);
+          if(content_type==='text/html'){
+            setResValue(res.data || null)
+          }else{
+            setResValue(JSON.stringify(res.data, null, 4) || null);
+          }
+          // setResValue(res.data || null);
           setSize(
             prettyBytes(
               JSON.stringify(res.data).length +
@@ -75,6 +85,7 @@ function App() {
           setTime(res.customData.time);
         })
         .catch((e) => {
+          setIsLoading(false);
           console.log(e);
           setResValue(e);
         });
@@ -82,8 +93,15 @@ function App() {
   };
 
   const handleUrl = (e) => {
-    setUrl(e.target.value)
-  }
+    setUrl(e.target.value);
+  };
+
+  const handleEnter = (e) => {
+    let code = e.keyCode || e.which;
+    if (code === 13) {
+      document.getElementById("send").click();
+    }
+  };
 
   return (
     <div className="container-fluid p-4">
@@ -96,7 +114,10 @@ function App() {
           <option value="dev">Dev</option>
           <option value="test">Test</option>
         </select>
-        <select className="form-select flex-grow-0 w-auto">
+        <select
+          className="form-select flex-grow-0 w-auto"
+          onChange={(e) => setMethod(e.target.value)}
+        >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
           <option value="PUT">PUT</option>
@@ -107,6 +128,7 @@ function App() {
           className="form-control"
           value={url}
           onChange={handleUrl}
+          onKeyPress={handleEnter}
         />
         {/* <div
           className="card position-absolute top-100"
@@ -122,26 +144,71 @@ function App() {
           type="submit"
           className="btn btn-primary"
           onClick={handleSubmit}
+          id="send"
         >
-          Send
+          {isLoading ? "Sending" : "Send"}
         </button>
       </div>
       <div className="row border-top border-bottom row-1">
         <div className="col-5 border-end outer">
-          <select onChange={(e) => setRestHead(e.target.value)}>
+          {/* <select onChange={(e) => setRestHead(e.target.value)}>
             <option value="Params">Params</option>
             <option value="Auth">Auth</option>
             <option value="Headers">Headers</option>
             <option selected value="Body">
               Body
             </option>
-          </select>
+          </select> */}
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                className={restHead === "Params" ? "nav-link active" : "nav-link"}
+                onClick={(e) => setRestHead(e.target.innerText)}
+              >
+                Params
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                className={restHead === "Auth" ? "nav-link active" : "nav-link"}
+                onClick={(e) => setRestHead("Auth")}
+              >
+                Authorization
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                className={
+                  restHead === "Headers" ? "nav-link active" : "nav-link"
+                }
+                onClick={(e) => setRestHead(e.target.innerText)}
+              >
+                Headers
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                className={restHead === "Body" ? "nav-link active" : "nav-link"}
+                onClick={(e) => setRestHead(e.target.innerText)}
+              >
+                Body
+              </button>
+            </li>
+          </ul>
           {restHead === "Body" && (
             <Body reqValue={reqValue} setReqValue={setReqValue} />
           )}
           {restHead === "Auth" && <Auth auth={auth} setAuth={setAuth} />}
-          {restHead === "Params" && <Params qpList={qpList} setQpList={setQpList} queryParam={queryParam} url={url} setUrl={setUrl}/>}
-          {restHead === "Headers" && <Headers auth={auth}/>}
+          {restHead === "Params" && (
+            <Params
+              qpList={qpList}
+              setQpList={setQpList}
+              queryParam={queryParam}
+              url={url}
+              setUrl={setUrl}
+            />
+          )}
+          {restHead === "Headers" && <Headers auth={auth} />}
         </div>
         <div className="col-7">
           <div className="d-flex justify-content-between my-2">
