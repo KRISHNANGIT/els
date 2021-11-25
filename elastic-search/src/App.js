@@ -39,6 +39,7 @@ function App() {
   });
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
+  const [backUrl, setBackUrl] = useState([]);
 
   const handleSubmit = async () => {
     setResValue("");
@@ -67,12 +68,12 @@ function App() {
         .then((res) => {
           setIsLoading(false);
           console.log(res);
-          let content_type = res.headers['content-type'].split(';')[0]
+          let content_type = res.headers["content-type"].split(";")[0];
           setStatus(res.status);
           if (res.data.status) setStatus(res.data.status);
-          if(content_type==='text/html'){
-            setResValue(res.data || null)
-          }else{
+          if (content_type === "text/html") {
+            setResValue(res.data || null);
+          } else {
             setResValue(JSON.stringify(res.data, null, 4) || null);
           }
           // setResValue(res.data || null);
@@ -89,6 +90,11 @@ function App() {
           console.log(e);
           setResValue(e);
         });
+
+      //for backUrl
+      const urlSet = new Set([...backUrl]);
+      urlSet.add(url);
+      setBackUrl([...urlSet]);
     }
   };
 
@@ -103,9 +109,25 @@ function App() {
     }
   };
 
+  const handleBackUrl = () => {
+    let popedUrl = [...backUrl].filter(
+      (url, index) => index !== [...backUrl].length - 1
+    );
+    console.log({ popedUrl, uri: popedUrl.at(-1) });
+    setUrl(popedUrl.at(-1));
+    setBackUrl(popedUrl);
+  };
+
   return (
     <div className="container-fluid p-4">
       <div className="input-group mb-4">
+        <button
+          className="btn btn-primary"
+          disabled={backUrl.length > 1 ? false : true}
+          onClick={handleBackUrl}
+        >
+          Back
+        </button>
         <select
           className="form-select flex-grow-0 w-auto"
           onChange={(e) => setUrl(urls[e.target.value])}
@@ -162,7 +184,9 @@ function App() {
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
               <button
-                className={restHead === "Params" ? "nav-link active" : "nav-link"}
+                className={
+                  restHead === "Params" ? "nav-link active" : "nav-link"
+                }
                 onClick={(e) => setRestHead(e.target.innerText)}
               >
                 Params
