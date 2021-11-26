@@ -135,6 +135,14 @@ function App() {
     setBackUrl(popedUrl);
   };
 
+  const handleStart = (e) => {
+    console.log(e);
+    let code = e.keyCode || e.which;
+    if (code === 13) {
+      document.getElementById("start").click();
+    }
+  };
+
   return (
     <div className="container-fluid p-4">
       <div className="input-group mb-4">
@@ -194,17 +202,27 @@ function App() {
           placeholder="Set Timer"
           disabled={startTimer ? true : false}
           onChange={(e) => setTimerValue(e.target.value)}
+          onKeyPress={handleStart}
         />
-        <button className="btn btn-success" onClick={() => setStartTimer(true)}>Start</button>
-        <button
-          className="btn btn-danger"
-          onClick={() => {
-            setStartTimer(false);
-            clearInterval(timer);
-          }}
-        >
-          Stop
-        </button>
+        {!startTimer ? (
+          <button
+            className="btn btn-success"
+            id="start"
+            onClick={() => setStartTimer(true)}
+          >
+            Start
+          </button>
+        ) : (
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              setStartTimer(false);
+              clearInterval(timer);
+            }}
+          >
+            Stop
+          </button>
+        )}
       </div>
       <div className="row border-top border-bottom row-1">
         <div className="col-5 border-end outer">
