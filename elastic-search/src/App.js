@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CodeMirror from "@uiw/react-codemirror";
 // import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 import Body from "./Body";
@@ -24,6 +24,8 @@ const urls = {
   test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.comtest:9243/test",
 };
 
+let timer;
+
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [method, setMethod] = useState("GET");
@@ -40,6 +42,21 @@ function App() {
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
   const [backUrl, setBackUrl] = useState([]);
+
+  const [timerValue, setTimerValue] = useState(0);
+  const [startTimer, setStartTimer] = useState(false);
+
+  useEffect(() => {
+    if (timerValue > 0 && startTimer) {
+      handleSubmit();
+      timer = setInterval(() => {
+        handleSubmit();
+      }, timerValue * 1000);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [startTimer]);
 
   const handleSubmit = async () => {
     setResValue("");
@@ -169,6 +186,24 @@ function App() {
           id="send"
         >
           {isLoading ? "Sending" : "Send"}
+        </button>
+      </div>
+      <div className="input-group mb-2">
+        <input
+          className="form-control-sm"
+          placeholder="Set Timer"
+          disabled={startTimer ? true : false}
+          onChange={(e) => setTimerValue(e.target.value)}
+        />
+        <button className="btn btn-success" onClick={() => setStartTimer(true)}>Start</button>
+        <button
+          className="btn btn-danger"
+          onClick={() => {
+            setStartTimer(false);
+            clearInterval(timer);
+          }}
+        >
+          Stop
         </button>
       </div>
       <div className="row border-top border-bottom row-1">
