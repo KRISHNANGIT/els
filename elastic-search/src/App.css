@@ -18,3 +18,7 @@
 #remove {
   cursor: pointer;
 }
+
+.clipboard:hover{
+  cursor: pointer;
+}

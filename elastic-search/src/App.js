@@ -3,13 +3,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CodeMirror from "@uiw/react-codemirror";
 // import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import Body from "./Body";
 import Auth from "./Auth";
 import Params from "./Params";
 import Headers from "./Headers";
+import { FiCopy } from "react-icons/fi";
+import { FaClipboardCheck } from "react-icons/fa";
 
 const queryParam = {
   checked: false,
@@ -45,6 +48,11 @@ function App() {
 
   const [timerValue, setTimerValue] = useState(0);
   const [startTimer, setStartTimer] = useState(false);
+  //clipboard
+  const [isCopied, setIsCopied] = useState(false);
+
+  //change method when click back button
+  const methodRef = useRef(null);
 
   useEffect(() => {
     if (timerValue > 0 && startTimer) {
@@ -110,7 +118,7 @@ function App() {
 
       //for backUrl
       const urlSet = new Set([...backUrl]);
-      urlSet.add(url);
+      urlSet.add(`${url}____${method}`);
       setBackUrl([...urlSet]);
     }
   };
@@ -130,8 +138,9 @@ function App() {
     let popedUrl = [...backUrl].filter(
       (url, index) => index !== [...backUrl].length - 1
     );
-    console.log({ popedUrl, uri: popedUrl.at(-1) });
-    setUrl(popedUrl.at(-1));
+    console.log({ popedUrl, uri: popedUrl.at(-1).split("____") });
+    setUrl(popedUrl.at(-1).split("____")[0]);
+    methodRef.current.value = popedUrl.at(-1).split("____")[1];
     setBackUrl(popedUrl);
   };
 
@@ -141,6 +150,13 @@ function App() {
     if (code === 13) {
       document.getElementById("start").click();
     }
+  };
+
+  const handleClipboard = () => {
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 1000);
   };
 
   return (
@@ -164,6 +180,7 @@ function App() {
         <select
           className="form-select flex-grow-0 w-auto"
           onChange={(e) => setMethod(e.target.value)}
+          ref={methodRef}
         >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
@@ -299,6 +316,15 @@ function App() {
               </div>
               <div className="me-4">
                 Size: <span data-size>{size}</span>
+              </div>
+              <div className="me-4">
+                <CopyToClipboard className="clipboard" text={resValue} onCopy={handleClipboard}>
+                  {isCopied ? (
+                      <FaClipboardCheck color="green"/>
+                  ) : (
+                    <FiCopy />
+                  )}
+                </CopyToClipboard>
               </div>
             </div>
           </div>
