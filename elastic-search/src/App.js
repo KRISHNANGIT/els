@@ -213,7 +213,7 @@ function App() {
           {isLoading ? "Sending" : "Send"}
         </button>
       </div>
-      <div className="input-group mb-2">
+      {/* <div className="input-group mb-2">
         <input
           className="form-control-sm"
           placeholder="Set Timer"
@@ -240,7 +240,7 @@ function App() {
             Stop
           </button>
         )}
-      </div>
+      </div> */}
       <div className="row border-top border-bottom row-1">
         <div className="col-5 border-end outer">
           {/* <select onChange={(e) => setRestHead(e.target.value)}>
@@ -303,6 +303,34 @@ function App() {
             />
           )}
           {restHead === "Headers" && <Headers auth={auth} />}
+          <div className="input-group mt-2">
+        <input
+          className="form-control-sm"
+          placeholder="Set Timer"
+          disabled={startTimer ? true : false}
+          onChange={(e) => setTimerValue(e.target.value)}
+          onKeyPress={handleStart}
+        />
+        {!startTimer ? (
+          <button
+            className="btn btn-success"
+            id="start"
+            onClick={() => setStartTimer(true)}
+          >
+            Start
+          </button>
+        ) : (
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              setStartTimer(false);
+              clearInterval(timer);
+            }}
+          >
+            Stop
+          </button>
+        )}
+      </div>
         </div>
         <div className="col-7">
           <div className="d-flex justify-content-between my-2">

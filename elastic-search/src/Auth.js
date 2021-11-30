@@ -19,7 +19,7 @@ function Auth({auth, setAuth}) {
     }
 
   return (
-    <>
+    <div className="p-2 border-bottom">
       <div className="border-top border-bottom my-3">
         <div className="m-3">
           <label>TYPE</label>
@@ -52,7 +52,7 @@ function Auth({auth, setAuth}) {
           />
         </div>
       </form>
-    </>
+    </div>
   );
 }
 
