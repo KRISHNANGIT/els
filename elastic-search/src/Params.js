@@ -45,7 +45,7 @@ function Params({ qpList, setQpList, queryParam, url, setUrl }) {
   };
 
   const handleCheck = (index) => {
-    console.log({ hCINdex: index });
+    // console.log({ hCINdex: index });
     let rows = [...qpList];
     rows[index].checked = !rows[index].checked;
     addQueryParam(rows);
@@ -55,7 +55,7 @@ function Params({ qpList, setQpList, queryParam, url, setUrl }) {
 
   console.log(qpList);
   return (
-    <>
+    <div style={{"height":"70vh"}}>
       <p className="mt-2 mb-0">Query Params</p>
       <table className="table table-bordered m-0">
         <thead>
@@ -119,7 +119,7 @@ function Params({ qpList, setQpList, queryParam, url, setUrl }) {
           })}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }
 

@@ -15,7 +15,7 @@ function Body({ reqValue, setReqValue }) {
     }, 1000)
   }
   return (
-    <>
+    <div style={{"height":"70vh"}}>
       <nav className="navbar">
         <div>
           <select className="selectpicker p-1">
@@ -52,7 +52,7 @@ function Body({ reqValue, setReqValue }) {
           }}
         />
       </div>
-    </>
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@ import React from "react";
 function Headers({ auth }) {
   const { username: USERNAME, password: PASSWORD } = auth;
   return (
-    <div className="inner">
+    <div className="inner" style={{"height": "70vh"}}>
       <p className="mt-2 mb-0 content">Headers</p>
       <table className="table table-bordered m-0">
         <thead>
