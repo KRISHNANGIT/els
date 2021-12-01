@@ -45,7 +45,7 @@ function Body({ reqValue, setReqValue }) {
       <div className="border">
         <CodeMirror
           value={reqValue}
-          height="60vh"
+          height="65vh"
           extensions={[json()]}
           onChange={(value, viewUpdate) => {
             setReqValue(value);

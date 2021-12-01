@@ -30,7 +30,7 @@ const urls = {
 let timer;
 
 function App() {
-  const [env, setEnv] = useState("dev")
+  const [env, setEnv] = useState("dev");
   const [isLoading, setIsLoading] = useState(false);
   const [method, setMethod] = useState("GET");
   const [status, setStatus] = useState("");
@@ -126,9 +126,9 @@ function App() {
   };
 
   const handleEnv = (e) => {
-    setEnv(e.target.value)
-    setUrl(urls[e.target.value])
-  }
+    setEnv(e.target.value);
+    setUrl(urls[e.target.value]);
+  };
 
   const handleUrl = (e) => {
     setUrl(e.target.value);
@@ -167,7 +167,7 @@ function App() {
   };
 
   return (
-    <div className="container-fluid p-4 border-bottom">
+    <div className="container-fluid">
       <div className="input-group mb-4">
         <button
           className="btn btn-primary"
@@ -311,34 +311,34 @@ function App() {
             />
           )}
           {restHead === "Headers" && <Headers auth={auth} />}
-          <div className="input-group mt-2">
-        <input
-          className="form-control-sm"
-          placeholder="Set Timer"
-          disabled={startTimer ? true : false}
-          onChange={(e) => setTimerValue(e.target.value)}
-          onKeyPress={handleStart}
-        />
-        {!startTimer ? (
-          <button
-            className="btn btn-success"
-            id="start"
-            onClick={() => setStartTimer(true)}
-          >
-            Start
-          </button>
-        ) : (
-          <button
-            className="btn btn-danger"
-            onClick={() => {
-              setStartTimer(false);
-              clearInterval(timer);
-            }}
-          >
-            Stop
-          </button>
-        )}
-      </div>
+          <div className="input-group mt-4">
+            <input
+              className="form-control-sm"
+              placeholder="Set Timer"
+              disabled={startTimer ? true : false}
+              onChange={(e) => setTimerValue(e.target.value)}
+              onKeyPress={handleStart}
+            />
+            {!startTimer ? (
+              <button
+                className="btn btn-success"
+                id="start"
+                onClick={() => setStartTimer(true)}
+              >
+                Start
+              </button>
+            ) : (
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  setStartTimer(false);
+                  clearInterval(timer);
+                }}
+              >
+                Stop
+              </button>
+            )}
+          </div>
         </div>
         <div className="col-7">
           <div className="d-flex justify-content-between my-2">
@@ -354,9 +354,13 @@ function App() {
                 Size: <span data-size>{size}</span>
               </div>
               <div className="me-4">
-                <CopyToClipboard className="clipboard" text={resValue} onCopy={handleClipboard}>
+                <CopyToClipboard
+                  className="clipboard"
+                  text={resValue}
+                  onCopy={handleClipboard}
+                >
                   {isCopied ? (
-                      <FaClipboardCheck color="green" />
+                    <FaClipboardCheck color="green" />
                   ) : (
                     <FiCopy title="copy to clipboard" />
                   )}
