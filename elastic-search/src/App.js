@@ -119,8 +119,15 @@ function App() {
         });
 
       //for backUrl
-      const urlSet = new Set([...backUrl]);
-      urlSet.add(`${url}____${method}`);
+      const urlSet = [...backUrl]
+      if(!urlSet.length){
+        urlSet.push({url, method, reqValue})
+      } else {
+        if(JSON.stringify(urlSet.at(-1)) !== JSON.stringify({url,method,reqValue})){
+            urlSet.push({url,method,reqValue})
+          }
+      }
+        console.log({urlSet})
       setBackUrl([...urlSet]);
     }
   };
@@ -145,9 +152,10 @@ function App() {
     let popedUrl = [...backUrl].filter(
       (url, index) => index !== [...backUrl].length - 1
     );
-    console.log({ popedUrl, uri: popedUrl.at(-1).split("____") });
-    setUrl(popedUrl.at(-1).split("____")[0]);
-    methodRef.current.value = popedUrl.at(-1).split("____")[1];
+    console.log({ popedUrl, uri: popedUrl.at(-1) });
+    setUrl(popedUrl.at(-1).url);
+    methodRef.current.value = popedUrl.at(-1).method;
+    setReqValue(popedUrl.at(-1).reqValue)
     setBackUrl(popedUrl);
   };
 
