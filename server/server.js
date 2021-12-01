@@ -1,5 +1,6 @@
 const express = require("express");
 const axios = require("axios");
+const logger = require('./config/logger');
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,7 @@ const headers = { Authorization: "Basic " + encodedToken };
 app.post("/search", async (req, res) => {
   console.log({ search_url: req.body.url, data: req.body.data });
   const { auth, url, data, method } = req.body;
+  logger.info(JSON.stringify({ url, data },null,'\t'))
   // const count = await axios.get(req.body.base_url, { headers, data: req.body.data })
   // try{
   await axios({
