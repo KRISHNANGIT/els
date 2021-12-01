@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-function Auth({auth, setAuth}) {
+function Auth({auth, setAuth, env}) {
     const { username, password } = auth
 
     const [show, setShow] = useState(false)
@@ -11,7 +11,7 @@ function Auth({auth, setAuth}) {
     }, [show])
 
     const handleAuth = (e) => {
-      localStorage.setItem([e.target.name], e.target.value)
+      localStorage.setItem(env, JSON.stringify({...auth,[e.target.name]: e.target.value}))
         setAuth({
             ...auth,
             [e.target.name]: e.target.value
@@ -19,7 +19,7 @@ function Auth({auth, setAuth}) {
     }
 
   return (
-    <div className="p-2 border-bottom">
+    <div className="p-2 border-bottom" style={{"height":"70vh"}}>
       <div className="border-top border-bottom my-3">
         <div className="m-3">
           <label>TYPE</label>
@@ -43,7 +43,7 @@ function Auth({auth, setAuth}) {
         </div>
         <div className='ms-5'>
           <input type="button" value="Clear Password" onClick={()=>{
-            localStorage.clear()
+            localStorage.removeItem(env)
             setAuth({
               username:'',
               password: ''

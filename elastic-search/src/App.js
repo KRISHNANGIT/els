@@ -39,10 +39,17 @@ function App() {
   const [url, setUrl] = useState(urls.dev);
   const [restHead, setRestHead] = useState("Body");
   const [qpList, setQpList] = useState([queryParam]);
-  const [auth, setAuth] = useState({
-    username: localStorage.getItem("username"),
-    password: localStorage.getItem("password"),
-  });
+  // const [auth, setAuth] = useState({
+  //   username: localStorage.getItem("username"),
+  //   password: localStorage.getItem("password"),
+  // });
+  if(!localStorage.getItem(env)){
+    localStorage.setItem(env, JSON.stringify({
+      username: '',
+      password: ''
+    }))
+  }
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem(env)));
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
   const [backUrl, setBackUrl] = useState([]);
@@ -135,6 +142,7 @@ function App() {
   const handleEnv = (e) => {
     setEnv(e.target.value);
     setUrl(urls[e.target.value]);
+    setAuth(JSON.parse(localStorage.getItem(e.target.value)))
   };
 
   const handleUrl = (e) => {
@@ -308,7 +316,7 @@ function App() {
           {restHead === "Body" && (
             <Body reqValue={reqValue} setReqValue={setReqValue} />
           )}
-          {restHead === "Auth" && <Auth auth={auth} setAuth={setAuth} />}
+          {restHead === "Auth" && <Auth auth={auth} setAuth={setAuth} env={env}/>}
           {restHead === "Params" && (
             <Params
               qpList={qpList}
