@@ -30,6 +30,7 @@ const urls = {
 let timer;
 
 function App() {
+  const [env, setEnv] = useState("dev")
   const [isLoading, setIsLoading] = useState(false);
   const [method, setMethod] = useState("GET");
   const [status, setStatus] = useState("");
@@ -48,6 +49,7 @@ function App() {
 
   const [timerValue, setTimerValue] = useState(0);
   const [startTimer, setStartTimer] = useState(false);
+
   //clipboard
   const [isCopied, setIsCopied] = useState(false);
 
@@ -89,7 +91,7 @@ function App() {
       const data = JSON.parse(reqValue || null);
       setIsLoading(true);
       await axios
-        .post("/search", { url, data, auth, method })
+        .post("/search", { url, data, auth, method, env })
         .then((res) => {
           setIsLoading(false);
           console.log(res);
@@ -122,6 +124,11 @@ function App() {
       setBackUrl([...urlSet]);
     }
   };
+
+  const handleEnv = (e) => {
+    setEnv(e.target.value)
+    setUrl(urls[e.target.value])
+  }
 
   const handleUrl = (e) => {
     setUrl(e.target.value);
@@ -160,7 +167,7 @@ function App() {
   };
 
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid p-4 border-bottom">
       <div className="input-group mb-4">
         <button
           className="btn btn-primary"
@@ -170,8 +177,9 @@ function App() {
           Back
         </button>
         <select
+          value={env}
           className="form-select flex-grow-0 w-auto"
-          onChange={(e) => setUrl(urls[e.target.value])}
+          onChange={handleEnv}
         >
           {/* <option value="default">Default</option> */}
           <option value="dev">Dev</option>
@@ -241,7 +249,7 @@ function App() {
           </button>
         )}
       </div> */}
-      <div className="row border-top border-bottom row-1">
+      <div className="row border-top row-1">
         <div className="col-5 border-end outer">
           {/* <select onChange={(e) => setRestHead(e.target.value)}>
             <option value="Params">Params</option>
@@ -251,8 +259,8 @@ function App() {
               Body
             </option>
           </select> */}
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
+          <ul className="nav nav-tabs" id="myTab" role="tablist">
+            <li className="nav-item" role="presentation">
               <button
                 className={
                   restHead === "Params" ? "nav-link active" : "nav-link"
@@ -262,7 +270,7 @@ function App() {
                 Params
               </button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li className="nav-item" role="presentation">
               <button
                 className={restHead === "Auth" ? "nav-link active" : "nav-link"}
                 onClick={(e) => setRestHead("Auth")}
@@ -270,7 +278,7 @@ function App() {
                 Authorization
               </button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li className="nav-item" role="presentation">
               <button
                 className={
                   restHead === "Headers" ? "nav-link active" : "nav-link"
@@ -280,7 +288,7 @@ function App() {
                 Headers
               </button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li className="nav-item" role="presentation">
               <button
                 className={restHead === "Body" ? "nav-link active" : "nav-link"}
                 onClick={(e) => setRestHead(e.target.innerText)}
@@ -348,9 +356,9 @@ function App() {
               <div className="me-4">
                 <CopyToClipboard className="clipboard" text={resValue} onCopy={handleClipboard}>
                   {isCopied ? (
-                      <FaClipboardCheck color="green"/>
+                      <FaClipboardCheck color="green" />
                   ) : (
-                    <FiCopy />
+                    <FiCopy title="copy to clipboard" />
                   )}
                 </CopyToClipboard>
               </div>

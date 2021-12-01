@@ -16,7 +16,7 @@ function Body({ reqValue, setReqValue }) {
   }
   return (
     <>
-      <nav className="navbar border-bottom">
+      <nav className="navbar">
         <div>
           <select className="selectpicker p-1">
             {/* <option value="none">none</option> */}
@@ -39,13 +39,13 @@ function Body({ reqValue, setReqValue }) {
           </select>
         </div>
         <CopyToClipboard className="clipboard" text={reqValue} onCopy={handleClipboard}>
-          {isCopied ? <FaClipboardCheck color="green" /> : <FiCopy />}
+          {isCopied ? <FaClipboardCheck color="green" /> : <FiCopy title="copy to clipboard"/>}
         </CopyToClipboard>
       </nav>
       <div className="border">
         <CodeMirror
           value={reqValue}
-          height="50vh"
+          height="60vh"
           extensions={[json()]}
           onChange={(value, viewUpdate) => {
             setReqValue(value);
