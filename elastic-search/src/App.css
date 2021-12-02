@@ -19,6 +19,20 @@
   cursor: pointer;
 }
 
-.clipboard:hover{
+.clipboard:hover {
   cursor: pointer;
 }
+
+.suggestions {
+  margin-left: 14.7rem !important;
+  width: 65rem;
+}
+
+/* .suggestions li{
+  padding-left: 0.5rem
+}
+
+.suggestions li:hover{
+  cursor: pointer;
+  background-color: darkgray;
+} */

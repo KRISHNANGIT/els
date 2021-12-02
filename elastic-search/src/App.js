@@ -24,7 +24,7 @@ const queryParam = {
 const urls = {
   // default: "",
   dev: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243",
-  test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.comtest:9243/test",
+  test: "https://31bda3cd72b34dcb85e604b4bcea12b1.eastus2.azure.elastic-cloud.com:9243/test",
 };
 
 let timer;
@@ -43,11 +43,14 @@ function App() {
   //   username: localStorage.getItem("username"),
   //   password: localStorage.getItem("password"),
   // });
-  if(!localStorage.getItem(env)){
-    localStorage.setItem(env, JSON.stringify({
-      username: '',
-      password: ''
-    }))
+  if (!localStorage.getItem(env)) {
+    localStorage.setItem(
+      env,
+      JSON.stringify({
+        username: "",
+        password: "",
+      })
+    );
   }
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem(env)));
   const [reqValue, setReqValue] = useState("");
@@ -56,6 +59,10 @@ function App() {
 
   const [timerValue, setTimerValue] = useState(0);
   const [startTimer, setStartTimer] = useState(false);
+
+  //suggesion
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [filteredSuggest, setFilteredSuggest] = useState([]);
 
   //clipboard
   const [isCopied, setIsCopied] = useState(false);
@@ -77,6 +84,8 @@ function App() {
 
   const handleSubmit = async () => {
     setResValue("");
+    setShowSuggest(false);
+    // setFilteredSuggest([]);
     axios.interceptors.request.use((request) => {
       request.customData = request.customData || {};
       request.customData.startTime = new Date().getTime();
@@ -126,15 +135,17 @@ function App() {
         });
 
       //for backUrl
-      const urlSet = [...backUrl]
-      if(!urlSet.length){
-        urlSet.push({url, method, reqValue})
+      const urlSet = [...backUrl];
+      if (!urlSet.length) {
+        urlSet.push({ url, method, reqValue });
       } else {
-        if(JSON.stringify(urlSet.at(-1)) !== JSON.stringify({url,method,reqValue})){
-            urlSet.push({url,method,reqValue})
-          }
+        if (
+          JSON.stringify(urlSet.at(-1)) !==
+          JSON.stringify({ url, method, reqValue })
+        ) {
+          urlSet.push({ url, method, reqValue });
+        }
       }
-        console.log({urlSet})
       setBackUrl([...urlSet]);
     }
   };
@@ -142,11 +153,16 @@ function App() {
   const handleEnv = (e) => {
     setEnv(e.target.value);
     setUrl(urls[e.target.value]);
-    setAuth(JSON.parse(localStorage.getItem(e.target.value)))
+    setAuth(JSON.parse(localStorage.getItem(e.target.value)));
   };
 
-  const handleUrl = (e) => {
+  const handleUrl = async (e) => {
     setUrl(e.target.value);
+    await axios
+      .post("/suggestions", { data: e.target.value })
+      .then((res) => setFilteredSuggest(res.data))
+      .catch((e) => console.log(e));
+    setShowSuggest(true);
   };
 
   const handleEnter = (e) => {
@@ -163,7 +179,7 @@ function App() {
     console.log({ popedUrl, uri: popedUrl.at(-1) });
     setUrl(popedUrl.at(-1).url);
     methodRef.current.value = popedUrl.at(-1).method;
-    setReqValue(popedUrl.at(-1).reqValue)
+    setReqValue(popedUrl.at(-1).reqValue);
     setBackUrl(popedUrl);
   };
 
@@ -182,8 +198,13 @@ function App() {
     }, 1000);
   };
 
+  const handleSuggest = (e) => {
+    setUrl(e.target.innerText);
+    setShowSuggest(false);
+  };
+
   return (
-    <div className="container-fluid">
+    <div className="container-fluid p-4">
       <div className="input-group mb-4">
         <button
           className="btn btn-primary"
@@ -218,6 +239,23 @@ function App() {
           onChange={handleUrl}
           onKeyPress={handleEnter}
         />
+        <ul
+          className={
+            showSuggest && filteredSuggest.length > 0
+              ? "dropdown-menu show top-100 suggestions"
+              : "dropdown-menu"
+          }
+        >
+          {filteredSuggest?.map((list) => {
+            return (
+              <li key={list} onClick={handleSuggest}>
+                <button className="dropdown-item" type="button">
+                  {list}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
         {/* <div
           className="card position-absolute top-100"
           style={{ width: "67rem", zIndex: "1" }}
@@ -316,7 +354,9 @@ function App() {
           {restHead === "Body" && (
             <Body reqValue={reqValue} setReqValue={setReqValue} />
           )}
-          {restHead === "Auth" && <Auth auth={auth} setAuth={setAuth} env={env}/>}
+          {restHead === "Auth" && (
+            <Auth auth={auth} setAuth={setAuth} env={env} />
+          )}
           {restHead === "Params" && (
             <Params
               qpList={qpList}
