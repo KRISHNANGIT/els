@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CodeMirror from "@uiw/react-codemirror";
 // import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -13,6 +13,7 @@ import Params from "./Params";
 import Headers from "./Headers";
 import { FiCopy } from "react-icons/fi";
 import { FaClipboardCheck } from "react-icons/fa";
+import { isExist } from "./ReusableFunctions/Auth";
 
 const queryParam = {
   checked: false,
@@ -44,19 +45,24 @@ function App() {
   //   password: localStorage.getItem("password"),
   // });
 
-  const isExist = (value) => {
-    if (!localStorage.getItem(value)) {
-      localStorage.setItem(
-        value,
-        JSON.stringify({
+  const getAuth = (value) => {
+    try {
+      let getEnv = JSON.parse(localStorage.getItem(env));
+      let origin = new URL(value).origin;
+      if (getEnv.hasOwnProperty(origin)) {
+        return getEnv[origin];
+      } else {
+        return {
           username: "",
           password: "",
-        })
-      );
+        };
+      }
+    } catch {
+      return { username: "", password: "" };
     }
-    return JSON.parse(localStorage.getItem(value))
-  }
-  const [auth, setAuth] = useState(isExist(env));
+  };
+
+  const [auth, setAuth] = useState(getAuth(url));
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
   const [backUrl, setBackUrl] = useState([]);
@@ -70,9 +76,6 @@ function App() {
 
   //clipboard
   const [isCopied, setIsCopied] = useState(false);
-
-  //change method when click back button
-  const methodRef = useRef(null);
 
   useEffect(() => {
     if (timerValue > 0 && startTimer) {
@@ -141,13 +144,13 @@ function App() {
       //for backUrl
       const urlSet = [...backUrl];
       if (!urlSet.length) {
-        urlSet.push({ url, method, reqValue });
+        urlSet.push({ url, method, reqValue, auth });
       } else {
         if (
           JSON.stringify(urlSet.at(-1)) !==
           JSON.stringify({ url, method, reqValue })
         ) {
-          urlSet.push({ url, method, reqValue });
+          urlSet.push({ url, method, reqValue, auth });
         }
       }
       setBackUrl([...urlSet]);
@@ -157,11 +160,12 @@ function App() {
   const handleEnv = (e) => {
     setEnv(e.target.value);
     setUrl(urls[e.target.value]);
-    setAuth(isExist(e.target.value));
+    setAuth(isExist(e.target.value, urls[e.target.value]));
   };
 
   const handleUrl = async (e) => {
     setUrl(e.target.value);
+    setAuth(getAuth(e.target.value));
     await axios
       .post("/suggestions", { data: e.target.value })
       .then((res) => setFilteredSuggest(res.data))
@@ -182,7 +186,8 @@ function App() {
     );
     console.log({ popedUrl, uri: popedUrl.at(-1) });
     setUrl(popedUrl.at(-1).url);
-    methodRef.current.value = popedUrl.at(-1).method;
+    setAuth(popedUrl.at(-1).auth)
+    setMethod(popedUrl.at(-1).method)
     setReqValue(popedUrl.at(-1).reqValue);
     setBackUrl(popedUrl);
   };
@@ -204,8 +209,11 @@ function App() {
 
   const handleSuggest = (e) => {
     setUrl(e.target.innerText);
+    setAuth(getAuth(e.target.innerText));
     setShowSuggest(false);
   };
+
+  console.log({ auth });
 
   return (
     <div className="container-fluid p-4">
@@ -227,9 +235,9 @@ function App() {
           <option value="test">Test</option>
         </select>
         <select
+          value={method}
           className="form-select flex-grow-0 w-auto"
           onChange={(e) => setMethod(e.target.value)}
-          ref={methodRef}
         >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
@@ -359,7 +367,13 @@ function App() {
             <Body reqValue={reqValue} setReqValue={setReqValue} />
           )}
           {restHead === "Auth" && (
-            <Auth auth={auth} setAuth={setAuth} env={env} />
+            <Auth
+              auth={auth}
+              setAuth={setAuth}
+              env={env}
+              url={url}
+              isExist={isExist}
+            />
           )}
           {restHead === "Params" && (
             <Params
