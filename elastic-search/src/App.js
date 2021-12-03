@@ -43,16 +43,20 @@ function App() {
   //   username: localStorage.getItem("username"),
   //   password: localStorage.getItem("password"),
   // });
-  if (!localStorage.getItem(env)) {
-    localStorage.setItem(
-      env,
-      JSON.stringify({
-        username: "",
-        password: "",
-      })
-    );
+
+  const isExist = (value) => {
+    if (!localStorage.getItem(value)) {
+      localStorage.setItem(
+        value,
+        JSON.stringify({
+          username: "",
+          password: "",
+        })
+      );
+    }
+    return JSON.parse(localStorage.getItem(value))
   }
-  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem(env)));
+  const [auth, setAuth] = useState(isExist(env));
   const [reqValue, setReqValue] = useState("");
   const [resValue, setResValue] = useState("");
   const [backUrl, setBackUrl] = useState([]);
@@ -153,7 +157,7 @@ function App() {
   const handleEnv = (e) => {
     setEnv(e.target.value);
     setUrl(urls[e.target.value]);
-    setAuth(JSON.parse(localStorage.getItem(e.target.value)));
+    setAuth(isExist(e.target.value));
   };
 
   const handleUrl = async (e) => {
