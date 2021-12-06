@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CodeMirror from "@uiw/react-codemirror";
 // import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -77,6 +77,26 @@ function App() {
   //clipboard
   const [isCopied, setIsCopied] = useState(false);
 
+  //when click out of url input box
+  const node = useRef()
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, []);
+
+  const handleClick = (e) => {
+    if (node.current.contains(e.target)) {
+      // inside click
+      return;
+    }
+    // outside click
+    setShowSuggest(false);
+  };
+
   useEffect(() => {
     if (timerValue > 0 && startTimer) {
       handleSubmit();
@@ -146,14 +166,15 @@ function App() {
       if (!urlSet.length) {
         urlSet.push({ url, method, reqValue, auth });
       } else {
+        const { url:lurl, method:lmethod, reqValue:lreqValue} = urlSet.at(-1)
         if (
-          JSON.stringify(urlSet.at(-1)) !==
-          JSON.stringify({ url, method, reqValue })
+          `${lurl}-${lmethod}-${lreqValue}` !==
+          `${url}-${method}-${reqValue}`
         ) {
           urlSet.push({ url, method, reqValue, auth });
         }
       }
-      setBackUrl([...urlSet]);
+      setBackUrl(urlSet);
     }
   };
 
@@ -185,11 +206,11 @@ function App() {
       (url, index) => index !== [...backUrl].length - 1
     );
     console.log({ popedUrl, uri: popedUrl.at(-1) });
+    setBackUrl(popedUrl);
     setUrl(popedUrl.at(-1).url);
     setAuth(popedUrl.at(-1).auth)
     setMethod(popedUrl.at(-1).method)
     setReqValue(popedUrl.at(-1).reqValue);
-    setBackUrl(popedUrl);
   };
 
   const handleStart = (e) => {
@@ -244,12 +265,14 @@ function App() {
           <option value="PUT">PUT</option>
           <option value="DELETE">DELETE</option>
         </select>
+
         <input
           type="url"
           className="form-control"
           value={url}
           onChange={handleUrl}
           onKeyPress={handleEnter}
+          ref={node}
         />
         <ul
           className={
@@ -257,6 +280,7 @@ function App() {
               ? "dropdown-menu show top-100 suggestions"
               : "dropdown-menu"
           }
+          ref={node}
         >
           {filteredSuggest?.map((list) => {
             return (
