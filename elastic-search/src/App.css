@@ -36,3 +36,11 @@
   cursor: pointer;
   background-color: darkgray;
 } */
+
+#beautify{
+  cursor: pointer;
+}
+
+#beautify:hover{
+  color: orange !important;
+}

@@ -6,41 +6,50 @@ import { FiCopy } from "react-icons/fi";
 import { FaClipboardCheck } from "react-icons/fa";
 
 function Body({ reqValue, setReqValue }) {
-  const [isCopied, setIsCopied] = useState(false)
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleClipboard = () => {
-    setIsCopied(true)
-    setTimeout(()=>{
-      setIsCopied(false)
-    }, 1000)
-  }
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 1000);
+  };
+
+  const beautify = () => {
+    setReqValue(JSON.stringify(JSON.parse(reqValue), null, 2) || null);
+  };
+
   return (
-    <div style={{"height":"70vh"}}>
+    <div style={{ height: "70vh" }}>
       <nav className="navbar">
         <div>
-          <select className="selectpicker p-1">
-            {/* <option value="none">none</option> */}
-            {/* <option value="form-data">form-data</option> */}
-            {/* <option value="Headers">x-www-form-urlencoded</option> */}
+          <select className="selectpicker">
             <option selected value="raw">
               RAW
             </option>
-            {/* <option value="binary">binary</option> */}
-            {/* <option value="GraphQL">GraphQL</option> */}
           </select>
-          <select className="m-1 p-1">
-            {/* <option value="Text">Text</option> */}
-            {/* <option value="Javascript">Javascript</option> */}
+          <select className="ms-1">
             <option selected value="JSON">
               JSON
             </option>
-            {/* <option value="HTML">HTML</option> */}
-            {/* <option value="XML">XML</option> */}
           </select>
         </div>
-        <CopyToClipboard className="clipboard" text={reqValue} onCopy={handleClipboard}>
-          {isCopied ? <FaClipboardCheck color="green" /> : <FiCopy title="copy to clipboard"/>}
-        </CopyToClipboard>
+        <div className="d-flex flex-direction-column">
+          <p className="me-2" id="beautify" onClick={beautify}>
+            Beautify
+          </p>
+          <CopyToClipboard
+            className="clipboard mt-1"
+            text={reqValue}
+            onCopy={handleClipboard}
+          >
+            {isCopied ? (
+              <FaClipboardCheck color="green" />
+            ) : (
+              <FiCopy title="copy to clipboard" />
+            )}
+          </CopyToClipboard>
+        </div>
       </nav>
       <div className="border">
         <CodeMirror
